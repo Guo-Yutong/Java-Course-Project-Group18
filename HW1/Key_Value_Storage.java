@@ -1,9 +1,11 @@
 package HW1;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Scanner;
@@ -14,48 +16,53 @@ public class Key_Value_Storage {
 	 * 给定Key查找对应的Value
 	 */
 	
-	/*
-	private static FileInputStream readFile(String filepath) {	//读文件流已嵌入add()方法中
+	public static String StoragePath;
+	public static String fileStoragePath;
+	
+	
+	//带参构造方法，实例化时指定工作区目录
+	public Key_Value_Storage(String StoragePath) {
+		this.StoragePath = StoragePath;
+	}
+	
+	//根据输入的哈希值读对应文件名的文件内容
+	public static String cat_file(String hashCode){
+		File file = new File(Key_Value_Storage.fileStoragePath + File.separator + hashCode);
+		BufferedReader reader = null;
+		StringBuffer sbf = new StringBuffer();
 		try {
-			File file = new File(filepath);
-			FileInputStream is = new FileInputStream(file);
-			return is;
+			reader = new BufferedReader(new FileReader(file));
+			String tempStr;
+			while ((tempStr = reader.readLine()) != null) {
+				sbf.append(tempStr);
+				sbf.append("\n");
+			}
+			reader.close();
+			return sbf.toString();
 		} catch(Exception e) {
 			e.printStackTrace();
-			return null;
-		}
-	}
-	*/
-
-	/*
-	private static byte[] SHA1Checksum(InputStream is) throws Exception{	//SHA1算法，已嵌入add()方法中
-		byte[] buffer = new byte[1024];	//缓存器
-		MessageDigest complete = MessageDigest.getInstance("SHA-1");
-		int numRead = 0;	//当前读到的字节数
-		do {
-			numRead = is.read(buffer);
-			if (numRead > 0) {
-				complete.update(buffer, 0, numRead);
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-		} while (numRead != -1);
-		is.close();
-		return complete.digest();
-	}
-	*/
-	
-	public static void add(String filepath) {
-		File file = new File(filepath);	//需要被add的文件
-		String parentPath = file.getParent();	//获取该文件上级目录
-		
-		//若文件上级目录内没有git仓库则创建之
-		File dir = new File(parentPath + File.separator + "mygit");
-		if (!dir.exists()) {
-			dir.mkdir();
 		}
+		return sbf.toString();
+	}
+	
+	
+	//向仓库中添加工作区目录下的名为filename的文件
+	public static void add(String filename) {
+		String absPath = Key_Value_Storage.StoragePath + File.separator + filename;	//提供文件绝对路径 
+		File file = new File(absPath);	//需要被add的文件
+		//String parentPath = file.getParent();	//获取该文件上级目录
 		
 		try {
-			FileInputStream is = new FileInputStream(filepath);	//创建输入流
-			FileOutputStream os = new FileOutputStream(dir+ File.separator + "temp");	//在仓库内创建一个名为temp的输出流，后续重命名为SHA1值
+			FileInputStream is = new FileInputStream(absPath);	//创建输入流
+			FileOutputStream os = new FileOutputStream(Key_Value_Storage.fileStoragePath + File.separator + "temp");	//在仓库内创建一个名为temp的输出流，后续重命名为SHA1值
 			byte[] buffer = new byte[1];	//缓存器，只能一个一个字节读，否则填不满会使用末尾字节补齐，改变源文件
 											//但一个一个字节读会造成读取速度变慢，待解决
 			MessageDigest complete = MessageDigest.getInstance("SHA-1");
@@ -79,16 +86,23 @@ public class Key_Value_Storage {
 				result += Integer.toString(sha1[i]&0xFF,16);
 			}
 			//System.out.println(result);
-			File output = new File(dir + File.separator + "temp");
-			File output_new = new File(dir + File.separator + result);
+			File output = new File(Key_Value_Storage.fileStoragePath + File.separator + "temp");
+			File output_new = new File(Key_Value_Storage.fileStoragePath + File.separator + result);
 			output.renameTo(output_new);	//将文件重命名为其内容的SHA1值
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
-	public static void main(String arg[]) throws FileNotFoundException {	//测试，可以产生在/mygit目录内以SHA1为文件名、文件内容不变的文件
-		add("/home/yutong_guo/Software_Eng/class2.txt");
-		System.out.println("程序结束");
+	
+	public static void init() {
+		//在构造方法指定的目录下创建mygit目录作为仓库
+		File storage = new File(Key_Value_Storage.StoragePath + File.separator + "mygit" + File.separator + "objects");
+		if (!storage.exists()) {
+				storage.mkdirs();
+		}
+		//将新建的仓库地址存入类属性
+		Key_Value_Storage.fileStoragePath = Key_Value_Storage.StoragePath + File.separator + "mygit" + File.separator + "objects";
 	}
 
 }
