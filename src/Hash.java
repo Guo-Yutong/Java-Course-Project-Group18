@@ -8,57 +8,36 @@ import java.security.MessageDigest;
 public class Hash {
     private String ans;
 
-    public Hash(String value) throws IOException {
-        this.ans = SHA1Checksum(value);
+    public Hash(File file) throws IOException {
+        FileInputStream is = new FileInputStream(file);
+        this.ans = Sha1Checksum(is);
     }
 
-    
-    //计算一个具体的hash值，通过getSha1方法返回字符串
-    public static String SHA1Checksum(String value) throws IOException {
-        File file = new File(value);
-        MessageDigest complete = MessageDigest.getInstance("SHA-1");
-        
-        //计算一个字符串的hash值
-        if(!file.exists()){
-            complete.update(value.getBytes());   
-        }
-
-        //计算一个文件的hash值
-        if(file.isFile()){
-            FileInputStream is = new FileInputStream(file);
-            byte[] buffer = new byte[1024];
-            int numRead = 0;
-            do {
-                numRead = is.read(buffer);
-                if (numRead > 0) {
-                    complete.update(buffer, 0, numRead);
-                }
-            } while (numRead != -1);
-            is.close();
-        }
-
-        //计算一个文件夹的hash值
-        if(file.isDirectory()){
-            File[] files = file.listFiles();
-            for(int i = 0;i < files.length;i++){
-                if(files[i].isFile()){
-                complete.update(files[i].getName().getBytes());
-                FileInputStream isfl = new FileInputStream(files[i]);
-                String flsha = SHA1Checksum(isfl);
-                complete.update(flsha.getBytes());
-                isfl.close();  
-            }
-                if(files[i].isDirectory()){
-                    complete.update(files[i].getName().getBytes());
-                    File subfile = new File(value + File.separator + files[i].getName());
-                    SHA1Checksum(subfile);
-                }
-            }
-        }
-        //以上所有update完后计算最后hash值
-        getSha1(complete.digest());
+    public Hash(String value)throws IOEXception{
+        this.ans = Sha1Checksum(value);
     }
 
+    public static String Sha1Checksum(FileInputStream is)throws IOException{
+        byte[] buffer = new byte[1024];
+        MessageDigest m = MessageDigest.getInstance("SHA-1");
+        int numRead = 0;
+        do{
+            numRead = is.read(buffer);
+            if(numRead > 0){
+                m.update(buffer,0,numRead);
+            }
+        }while(numRead!=1);
+        is.close();
+        String ans = getSha1(m.digest());
+        return ans;
+    }
+
+    public static String Sha1Checksum(String value)throws IOException{
+        MessageDigest m = MessageDigest.getInstance("SHA-1");
+        m.update(value.getBytes());
+        String ans = getSha1(m.digest());
+        return ans;
+    }
 
     public static String getSha1(byte data[]){
         StringBuffer strBuffer = new StringBuffer();
