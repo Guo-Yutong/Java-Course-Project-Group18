@@ -6,18 +6,16 @@ import java.io.IOException;
 
 public class Tree extends KeyValueObject {
     private String value = "";
-    public Tree(String path) throws IOException{
-        File file = new File(path);
-        this.type = "tree";
-    }
+
 
     public Tree(File file) throws Exception {
+        this.type = "tree";
         for(File f:file.listFiles()){
             if(f.isFile()){
                 value = value + "\n" + "100644 blob " + new Blob(f).getKey() + " " + f.getName();
             }
             else if(f.isDirectory()){
-                value = value + "\n" + "100644 tree " + new Tree(f).getKey() + " " + f.getName();
+                value = value + "\n" + "040000 tree " + new Tree(f).getKey() + " " + f.getName();
             }
         }
         generateKey(value);

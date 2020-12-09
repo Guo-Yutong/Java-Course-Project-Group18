@@ -13,10 +13,10 @@ public class Hash {
         this.ans = Sha1Checksum(is);
     }
 
-    public Hash(String value)throws IOEXception{
+    public Hash(String value)throws IOException{
         this.ans = Sha1Checksum(value);
     }
-
+    //计算文件Hash值
     public static String Sha1Checksum(FileInputStream is)throws IOException{
         byte[] buffer = new byte[1024];
         MessageDigest m = MessageDigest.getInstance("SHA-1");
@@ -32,6 +32,7 @@ public class Hash {
         return ans;
     }
 
+    //计算字符串哈希值
     public static String Sha1Checksum(String value)throws IOException{
         MessageDigest m = MessageDigest.getInstance("SHA-1");
         m.update(value.getBytes());
@@ -46,7 +47,8 @@ public class Hash {
         }
         return strBuffer.toString();
     }
-
+    
+    //数据域封装设置get方法
     public String getSHA1(){
         return this.ans;
     }
