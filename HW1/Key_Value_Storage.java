@@ -1,14 +1,7 @@
 package HW1;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.InputStream;
+import java.io.*;
 import java.security.MessageDigest;
-import java.util.Scanner;
 
 public class Key_Value_Storage {
 	/* Key作为文件名，文件内容作为Value
@@ -16,14 +9,18 @@ public class Key_Value_Storage {
 	 * 给定Key查找对应的Value
 	 */
 	
-	public static String StoragePath;
-	public static String fileStoragePath;
+	public static String StoragePath;	//工作区目录
+	public static String fileStoragePath;	//存储目录，即工作区目录下/mygit/objects
 	
+	
+	public Key_Value_Storage() {	
+	}
 	
 	//带参构造方法，实例化时指定工作区目录
 	public Key_Value_Storage(String StoragePath) {
 		this.StoragePath = StoragePath;
 	}
+	
 	
 	//根据输入的哈希值读对应文件名的文件内容
 	public static String cat_file(String hashCode){
@@ -55,7 +52,7 @@ public class Key_Value_Storage {
 	
 	
 	//向仓库中添加工作区目录下的名为filename的文件
-	public static void add(String filename) {
+	protected String addFile(String filename) {
 		String absPath = Key_Value_Storage.StoragePath + File.separator + filename;	//提供文件绝对路径 
 		File file = new File(absPath);	//需要被add的文件
 		//String parentPath = file.getParent();	//获取该文件上级目录
@@ -89,14 +86,17 @@ public class Key_Value_Storage {
 			File output = new File(Key_Value_Storage.fileStoragePath + File.separator + "temp");
 			File output_new = new File(Key_Value_Storage.fileStoragePath + File.separator + result);
 			output.renameTo(output_new);	//将文件重命名为其内容的SHA1值
+			return result;
 		}catch(Exception e) {
 			e.printStackTrace();
+			return null;
 		}
 		
 	}
 	
+	
+	//在构造方法指定的目录下创建mygit目录作为仓库
 	public static void init() {
-		//在构造方法指定的目录下创建mygit目录作为仓库
 		File storage = new File(Key_Value_Storage.StoragePath + File.separator + "mygit" + File.separator + "objects");
 		if (!storage.exists()) {
 				storage.mkdirs();
