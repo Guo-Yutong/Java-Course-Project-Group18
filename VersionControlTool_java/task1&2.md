@@ -6,7 +6,7 @@
   - key作为文件名，文件内容作为value
 - 支持以下功能
   - 给定value，向存储中添加对应的key-value
-  - 给定key，查找得到对应 [task1&2.md](task1&2.md) 的value值
+  - 给定key，查找得到对应的value值
 - 封装成class对外提供接口
 - 单元测试
 
