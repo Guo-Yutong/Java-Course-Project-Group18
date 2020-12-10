@@ -6,28 +6,29 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 public abstract class KeyValueObject {
     protected String type;
     protected String key;
     protected File file;
 
-    protected KeyValueObject(){
+    protected KeyValueObject() {
     }
-    
-    protected void generateKey(File file) throws IOException{
+
+    protected void generateKey(File file) throws IOException, NoSuchAlgorithmException {
         Hash s = new Hash(file);
         this.key = s.getSHA1();
         this.file = file;
     }
 
-    protected void generateKey(String value) throws IOException{
+    protected void generateKey(String value) throws IOException, NoSuchAlgorithmException {
         Hash s = new Hash(value);
         this.key = s.getSHA1();
     }
 
 
-    protected String getKey(){
+    public String getKey(){
         return this.key;
     }
 

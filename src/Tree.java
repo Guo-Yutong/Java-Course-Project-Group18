@@ -21,6 +21,9 @@ public class Tree extends KeyValueObject {
         generateKey(value);
     }
 
+    public String getValue(){
+        return this.value;
+    }
 
     @Override
     public String toString(){

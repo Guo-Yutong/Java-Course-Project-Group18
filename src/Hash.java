@@ -4,20 +4,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class Hash {
     private String ans;
 
-    public Hash(File file) throws IOException {
+    public Hash(File file) throws IOException, NoSuchAlgorithmException {
         FileInputStream is = new FileInputStream(file);
         this.ans = Sha1Checksum(is);
     }
 
-    public Hash(String value)throws IOException{
+    public Hash(String value) throws IOException, NoSuchAlgorithmException {
         this.ans = Sha1Checksum(value);
     }
-    //计算文件Hash值
-    public static String Sha1Checksum(FileInputStream is)throws IOException{
+
+    // 计算文件Hash值
+    public static String Sha1Checksum(FileInputStream is) throws IOException, NoSuchAlgorithmException {
         byte[] buffer = new byte[1024];
         MessageDigest m = MessageDigest.getInstance("SHA-1");
         int numRead = 0;
@@ -33,7 +35,7 @@ public class Hash {
     }
 
     //计算字符串哈希值
-    public static String Sha1Checksum(String value)throws IOException{
+    public static String Sha1Checksum(String value)throws IOException, NoSuchAlgorithmException {
         MessageDigest m = MessageDigest.getInstance("SHA-1");
         m.update(value.getBytes());
         String ans = getSha1(m.digest());
