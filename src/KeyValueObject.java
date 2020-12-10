@@ -9,26 +9,28 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 public abstract class KeyValueObject {
-    protected String type;
-    protected String key;
-    protected File file;
+    protected String type;//类型
+    protected String key; //key
+    protected File file; 
 
     protected KeyValueObject() {
     }
 
+    //生成key的函数，参数为文件
     protected void generateKey(File file) throws IOException, NoSuchAlgorithmException {
-        Hash s = new Hash(file);
-        this.key = s.getSHA1();
-        this.file = file;
+        Hash s = new Hash(file); //创建hash类
+        this.key = s.getSHA1(); //使用hash类方法，可以得到16进制字符串key值
+        this.file = file; 
     }
 
+    //生成key的函数，参数为hash值字符串（tree的value）
     protected void generateKey(String value) throws IOException, NoSuchAlgorithmException {
         Hash s = new Hash(value);
         this.key = s.getSHA1();
     }
 
 
-    public String getKey(){
+    public String getKey(){ //数据域封装
         return this.key;
     }
 
@@ -47,7 +49,7 @@ public abstract class KeyValueObject {
             int r = 0;
             while((r = input.read())!= -1){
                 output.write((byte)r);
-            }
+            }//为了写文件安全，写时未设置buffer
         }
     }
 }
