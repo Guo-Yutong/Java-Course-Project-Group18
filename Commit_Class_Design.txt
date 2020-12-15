@@ -1,0 +1,34 @@
+commit类
+/*
+ * git commit 命令将暂存区的blob和tree构造成一个tree
+ * 将构造的tree的hash连同上一次commit、commit时的注释一同存入新建文件
+ * 文件名为内容的hash(是吗?)
+ * （git还会存储作者和提交者信息，暂时不考虑）
+ * commit生成的文件和blob、tree生成的文件共同存储在.git/object下
+ * 
+ * 实现思路:调用Tree类，将暂存区内容构造成一个新的tree对象
+ * 对于commit构造出的tree，执行和普通tree相同的操作，取该tree的key，存入commit
+ * 对于parent，可以通过创建日志文件实现(模仿git)
+ * 每一次commit都将本次commit的key追加写入log文件，下一次commit时读取log的最后一行，即为parent
+ * 后续需要实现回滚操作时再创建一个HEAD文件存储目前领先的commit的key，本次暂不考虑
+ */
+
+继承KeyValueObject类
+  继承属性:
+  type = commit
+  key
+  file
+
+  自有属性:
+  String message  //存commit的注释
+  String parent //存上一次commit的key
+
+  继承方法:
+  generateKey() //生成hash
+  copyFile()  //不需要，因为commit需要新建文件，不需要复制文件
+
+  自有方法:
+  (不确定java是否有友类的概念，如果没有则需要重新实现tree的构造)
+  读log文件，获取上一次commit的key
+  创建commit文件并写入tree的key和上一次commit的key(parent)和注释信息(message)
+  写log文件，将本次commit的key追加写入
