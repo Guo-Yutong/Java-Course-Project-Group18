@@ -67,8 +67,9 @@
     - getKey、getType
     - 重写toString方法，加上“040000 tree“信息
     - 重写copy方法：创建以key为名的文件，将更新完毕的value内容写入其中
-
-
+- **Commit类**：继承KeyValueObject父类
+  - 数据域：1.项目根目录tree对象的key； 2.前驱commit对象的key；3.代码author；4.代码commiter；5.commit时间戳；6.commit备注/注释；7.此次commit的key
+  - 
 
 
 
