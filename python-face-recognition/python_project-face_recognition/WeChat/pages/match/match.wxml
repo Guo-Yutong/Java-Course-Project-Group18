@@ -1,0 +1,35 @@
+<view class="page">
+    <image class="imagePerson" src="../../image/unknown.png" mode='widthFix'></image>
+    <!--图片查询-->
+    <view class='weui-article'>
+        <view class="page-body-info">
+            <block wx:if="{{img_src}}">
+                <image src='{{img_src}}' class='image' mode='aspectFit'></image>
+            </block>
+            <block wx:else>
+                <view bindtap='chooseImage' class='image-plus image-plus-nb'>
+                    <view class='image-plus-horizontal'></view>
+                    <!--画一个水平线-->
+                    <view class='image-plus-vertical'></view>
+                    <!--画一个垂直线-->
+                </view>
+                <view class='image-plus-text'>点击这试试上传一张同学照片 查看Ta的消息吧</view>
+            </block>
+        </view>
+    </view>
+</view>
+
+    <!--姓名查询-->
+    <view class="weui-cells__title">或者输入名字 看看Ta在班上是什么样的呢？</view>
+    <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell weui-cell_input">
+        <input class="weui-input" maxlength="20" type="text" placeholder="姓名查人" confirm-type="search"/>
+        <button class="botton-search" type="default" bindtap="queryPhoneInfo" disabled="{{ disabled }}">查询</button>
+      </view>
+    </view>
+
+
+ <!--查看班级活跃度总榜，需要等后面做好了，修改下跳转页面的url-->
+<navigator class="start" url= "/pages/match/match" open-type="redirect"style="color:#FFFFFF">
+    <text class="indexString">查看班级活跃度总榜</text>
+</navigator>

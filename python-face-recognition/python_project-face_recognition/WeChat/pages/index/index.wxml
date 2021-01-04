@@ -1,0 +1,12 @@
+<!--pages/index/index.wxml-->
+<image class="imagePerson" src="../../image/girl.png" mode='widthFix'></image>
+<image class="imagePerson" src="../../image/boy.png" mode='widthFix'></image>
+
+<view class="index" style="color:#FFFFFF" >
+  <view class="viewName" style="margin-top: 30px;">
+    <navigator class="start" url= "/pages/match/match" open-type="redirect">
+      <text class="indexString">开始我的探索之旅</text>
+    </navigator>
+  </view> 
+  <image class="arrow" src="../../image/up.png" mode='widthFix'></image>
+</view>

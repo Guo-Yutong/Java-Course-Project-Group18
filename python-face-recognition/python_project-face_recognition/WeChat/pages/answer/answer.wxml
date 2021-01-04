@@ -1,0 +1,9 @@
+<!--pages/answer/answer.wxml-->
+<view class='weui-article'>
+        <view>
+            <view class="page__title__exp">ta可能是</view>
+            <view class="page__title__exp">{{name}}</view>
+            <image src='{{}}' class='image' mode='aspectFit'></image>
+        </view>
+  
+</view>

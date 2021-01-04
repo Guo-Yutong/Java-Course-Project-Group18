@@ -1,0 +1,17 @@
+/* pages/index/index.wxss */
+.start{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 45px;
+  margin-right: 80px; 
+  margin-bottom: 5px;
+  background-color: rgb(207, 90, 90);
+  width: 550rpx;
+  height: 100rpx;
+  border-radius: 10px
+}
+.arrow{
+  margin-top: 10px;
+  margin-left: 5px;
+}
