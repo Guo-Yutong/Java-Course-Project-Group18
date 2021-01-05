@@ -1,0 +1,25 @@
+I prelude1.inc
+> branch A
+<<<
+> branch B
+<<<
+> checkout A
+<<<
++ a.txt a.txt
+> add a.txt
+<<<
+> commit "Add a"
+<<<
+> checkout B
+<<<
++ a.txt nota.txt
+> add a.txt
+<<<
+> commit "Add nota"
+<<<
+> checkout A
+<<<
+> merge B
+Encountered a merge conflict.
+<<<
+= a.txt conflict-a.txt

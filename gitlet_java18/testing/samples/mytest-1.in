@@ -1,0 +1,43 @@
+I prelude1.inc
+> branch master
+A branch with that name already exists.
+<<<
+> branch A
+<<<
+> branch B
+<<<
+> branch C
+<<<
+> checkout A
+<<<
++ a.txt a.txt
+> add a.txt
+<<<
+> commit "Add a"
+<<<
+> checkout B
+<<<
++ b.txt b.txt
+> add b.txt
+<<<
+> commit "Add b"
+<<<
+> checkout C
+<<<
++ c.txt c.txt
+> add c.txt
+<<<
+> commit "Add c"
+<<<
+> checkout A
+<<<
+> merge A
+Cannot merge a branch with itself.
+<<<
+> merge B
+<<<
+> merge C
+<<<
+= a.txt a.txt
+= b.txt b.txt
+= c.txt c.txt
