@@ -110,7 +110,7 @@ public class Repository {
                                 secondParentId, msg);
         }
         for (String name : _stage.getStagedFileNames()) {
-            commit.commitFile(name, _stage.getBlob(name));
+            commit.commitFile(name, _stage.getObject(name));
         }
         for (String filename : _stage.getRemovedFiles()) {
             commit.removeFile(filename);
@@ -240,7 +240,8 @@ public class Repository {
     private static List<String> getUntrackedFileNames() {
         List<String> untrackedFiles = new ArrayList<>();
         for (String name : GittaUtils.plainFilenamesIn(PWD)) {
-            if (!_stage.isFileStaged(name)
+        	if (name.contentEquals(".gitta")) {
+        	}else if (!_stage.isFileStaged(name)
                     && !_lastCommit.containsFile(name)) {
                 untrackedFiles.add(name);
             } else if (_stage.isFileRemoved(name)) {
@@ -254,9 +255,16 @@ public class Repository {
     private static List<String> getModifiedFileNames() {
         List<String> modifiedFiles = new ArrayList<>();
         for (String name : GittaUtils.plainFilenamesIn(PWD)) {
-        	GittaObjects obj = GittaIO.readObject(GittaUtils.join(PWD, name));
-        	if(obj instanceof Blob) {
-	            String sha1 = ((Blob)(obj)).getSHA1();
+//        	GittaObjects obj = GittaIO.readObject(GittaUtils.join(PWD, name));
+        	if(name.contentEquals(".gitta")) {	
+        	}else {
+	        	File file = GittaUtils.join(PWD, name);
+	        	String sha1 = "";
+	        	if(file.isFile()) {
+		            sha1 = new Blob(file).getSHA1();
+	        	} else if (file.isDirectory()) {
+	        		sha1 = new Tree(file).getSHA1();
+	        	}
 	            if (_lastCommit.containsFile(name)
 	                    && !_lastCommit.containsObject(sha1)
 	                    && !_stage.isFileStaged(name)) {
@@ -265,17 +273,7 @@ public class Repository {
 	                    && !_stage.isBlobStaged(name, sha1)) {
 	                modifiedFiles.add(name + " (modified");
 	            }
-	        } else if (obj instanceof Tree) {
-	        	String sha1 = ((Tree)(obj)).getSHA1();
-	            if (_lastCommit.containsFile(name)
-	                    && !_lastCommit.containsObject(sha1)
-	                    && !_stage.isFileStaged(name)) {
-	                modifiedFiles.add(name + " (modified)");
-	            } else if (_stage.isFileStaged(name)
-	                    && !_stage.isBlobStaged(name, sha1)) {
-	                modifiedFiles.add(name + " (modified");
-	            }
-	        }
+        	}
         }
         for (String name : _stage.getStagedFileNames()) {
             if (!GittaUtils.join(PWD, name).exists()) {

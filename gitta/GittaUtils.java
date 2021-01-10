@@ -99,12 +99,6 @@ public class GittaUtils {
         return Paths.get(first.getPath(), others).toFile();
     }
     
-    public static void main(String[] args) {
-    	GittaUtils utl = new GittaUtils();
-    	System.out.println(utl.plainFilenamesIn("/home/yutong_guo/Java/gitta/bin/newfolder/newfolder2"));
-    	for(String str : utl.plainFilenamesIn("/home/yutong_guo/Java/gitta/bin/newfolder/newfolder2")) {
-    		System.out.println(join("/home/yutong_guo/Java/gitta/bin/newfolder/newfolder2",str).getAbsolutePath());
-    	}
-    }
+
 
 }

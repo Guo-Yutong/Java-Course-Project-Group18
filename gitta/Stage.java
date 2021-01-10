@@ -223,7 +223,7 @@ public class Stage implements GittaIO {
      * @param filename filename
      * @return file staged in staging area
      */
-    public File getBlob(String filename) {
+    public File getObject(String filename) {
         assert _stagedFiles.containsKey(filename);
         return GittaUtils.join(STAGE_FOLDER, _stagedFiles.get(filename));
     }
