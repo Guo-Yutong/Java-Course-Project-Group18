@@ -7,16 +7,8 @@ import java.util.HashMap;
 public class Tree extends GittaObjects implements GittaIO{
 	
 	private static final long serialVersionUID = 10L;
-	
-//	private static File PWD = new File(".");
 	/** The actual content of the tree */
     private String _actContent = "";
-//    /** A container of blobs under the tree */
-//    private HashMap<String,String> blobs;
-//    /** A container of trees under the tree */
-//    private HashMap<String,String> trees;
-
-
 
     /**
      * Create a Tree object with the specified parameters.
@@ -24,16 +16,14 @@ public class Tree extends GittaObjects implements GittaIO{
      */
     public Tree(File file) {
 		_type = "tree";
-		for(File f:file.listFiles()){ //for each遍历
-            if(f.isFile()){ //100644 blob hashkey a.txt 格式
+		for(File f:file.listFiles()){
+            if(f.isFile()){
             	Blob subBlob = new Blob(f);
-//            	String blobSHA1 = subBlob.getSHA1();
             	if (_actContent.length() == 0) {
             		_actContent = _actContent + "100644 blob " + subBlob.getSHA1() + " " + f.getName();
             	}else {
             		_actContent = _actContent + "\n" + "100644 blob " + subBlob.getSHA1() + " " + f.getName();
             	}
-//            	blobs.add(subBlob);
             }
             else if(f.isDirectory()){
             	Tree subTree = new Tree(f);
@@ -42,7 +32,6 @@ public class Tree extends GittaObjects implements GittaIO{
             	}else {
             		_actContent = _actContent + "\n" + "040000 tree " + subTree.getSHA1() + " " + f.getName();
             	}
-//            	trees.add(subTree);
             }
         }
 		_content = GittaIO.serialize(_actContent);

@@ -81,7 +81,7 @@ public class Commit extends GittaObjects implements GittaIO{
     /**
      * Init commit management.
      * @return init commit id
-     * @throws GitletException
+     * @throws GittaException
      */
     public static String init() throws GittaException {
         assert !OBJECTS_FOLDER.exists();

@@ -19,7 +19,7 @@ public interface GittaIO extends Serializable{
      *  in case of problems. */
     static byte[] readContents(File file) {
         if (!file.isFile()) {
-            throw new IllegalArgumentException("must be a normal file");
+            throw new IllegalArgumentException("must be a normal file\n");
         }
         try {
             return Files.readAllBytes(file.toPath());
@@ -43,7 +43,7 @@ public interface GittaIO extends Serializable{
         try {
             if (file.isDirectory()) {
                 throw
-                    new IllegalArgumentException("cannot overwrite directory");
+                    new IllegalArgumentException("cannot overwrite directory\n");
             }
             BufferedOutputStream str =
                 new BufferedOutputStream(Files.newOutputStream(file.toPath()));
@@ -111,7 +111,7 @@ public interface GittaIO extends Serializable{
             objectStream.close();
             return stream.toByteArray();
         } catch (IOException excp) {
-            throw ThrowGittaException.error("Internal error serializing commit.");
+            throw ThrowGittaException.error("Internal error serializing commit.\n");
         }
     }
 

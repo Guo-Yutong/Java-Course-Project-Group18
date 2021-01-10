@@ -46,7 +46,7 @@ public class Repository {
         assert !isExisted();
 
         if (!REPO_FOLDER.mkdir()) {
-            throw new GittaException("Failed to init repository.");
+            throw new GittaException("Failed to init repository.\n");
         }
         Stage.init();
         Reference.init();
@@ -143,7 +143,7 @@ public class Repository {
      * Try remove a file from staging area. If not exists in staging area,
      * then try remove it from working directory.
      * @param file file removed
-     * @throws GitletException
+     * @throws GittaException
      */
     public static void rm(File file) throws GittaException {
         if (_stage.isFileStaged(file)) {
@@ -152,10 +152,10 @@ public class Repository {
             _stage.addRemovedFile(file);
             if (!removeFile(file)) {
                 throw new GittaException("Failed to remove file"
-                                        + "from working directory");
+                                        + "from working directory\n");
             }
         } else {
-            throw new GittaException("No reason to remove the file");
+            throw new GittaException("No reason to remove the file\n");
         }
     }
 
@@ -191,7 +191,7 @@ public class Repository {
     public static void find(String msg) {
         List<String> commitIds = Commit.find(msg);
         if (commitIds.isEmpty()) {
-            throw new GittaException("Found no commit with that message");
+            throw new GittaException("Found no commit with that message\n");
         }
         for (String id : commitIds) {
             System.out.println(id);
@@ -255,7 +255,6 @@ public class Repository {
     private static List<String> getModifiedFileNames() {
         List<String> modifiedFiles = new ArrayList<>();
         for (String name : GittaUtils.plainFilenamesIn(PWD)) {
-//        	GittaObjects obj = GittaIO.readObject(GittaUtils.join(PWD, name));
         	if(name.contentEquals(".gitta")) {	
         	}else {
 	        	File file = GittaUtils.join(PWD, name);
@@ -292,11 +291,11 @@ public class Repository {
     /**
      * Checkout a file.
      * @param filename filename
-     * @throws GitletException
+     * @throws GittaException
      */
     public static void checkoutFile(String filename) throws GittaException {
         if (!_lastCommit.containsFile(filename)) {
-            throw new GittaException("File does not exist in that commit");
+            throw new GittaException("File does not exist in that commit\n");
         }
         _lastCommit.restoreFile(GittaUtils.join(PWD, filename));
     }
@@ -305,16 +304,16 @@ public class Repository {
      * Checkout a file with corresponding ID.
      * @param filename filename
      * @param id id of file
-     * @throws GitletException
+     * @throws GittaException
      */
     public static void checkoutFileWithID(String filename, String id)
                                                 throws GittaException {
         Commit commit = Commit.getCommit(id);
         if (commit == null) {
-            throw new GittaException("No commit with that id exists");
+            throw new GittaException("No commit with that id exists\n");
         }
         if (!commit.containsFile(filename)) {
-            throw new GittaException("File does not exist in that commit");
+            throw new GittaException("File does not exist in that commit\n");
         }
         commit.restoreFile(GittaUtils.join(PWD, filename));
     }
@@ -322,17 +321,17 @@ public class Repository {
     /**
      * Checkout a branch.
      * @param branch branch name
-     * @throws GitletException
+     * @throws GittaException
      */
     public static void checkoutBranch(String branch) throws GittaException {
         if (!_reference.containsBranch(branch)) {
-            throw new GittaException("No such branch exists.");
+            throw new GittaException("No such branch exists.\n");
         } else if (branch.equals(_head)) {
-            throw new GittaException("No need to checkout the current branch");
+            throw new GittaException("No need to checkout the current branch\n");
         }
         if (!isValidBranchCheckout(branch)) {
             throw new GittaException("There is an untracked file in the way;"
-                                   + " delete it, or add and commit it first");
+                                   + " delete it, or add and commit it first\n");
         }
         checkoutCommit(_reference.getBranch(branch));
         saveHead(branch);
@@ -381,7 +380,7 @@ public class Repository {
     /**
      * Create a new branch named BRANCH.
      * @param branch branch name
-     * @throws GitletException
+     * @throws GittaException
      */
     public static void branch(String branch) throws GittaException {
         checkBranchNotExist(branch);
@@ -396,7 +395,7 @@ public class Repository {
     public static void removeBranch(String branch) throws GittaException {
         checkBranchExist(branch);
         if (_head.equals(branch)) {
-            throw new GittaException("Cannot remove the current branch.");
+            throw new GittaException("Cannot remove the current branch.\n");
         }
         _reference.removeBranch(branch);
     }
@@ -408,7 +407,7 @@ public class Repository {
     private static void checkBranchExist(String branch) {
         if (!_reference.containsBranch(branch)) {
             throw new GittaException("A branch with that name"
-                                    + "does not exist.");
+                                    + "does not exist.\n");
         }
     }
 
@@ -419,23 +418,23 @@ public class Repository {
     private static void checkBranchNotExist(String branch) {
         if (_reference.containsBranch(branch)) {
             throw new GittaException("A branch with that name"
-                                        + "already exists.");
+                                        + "already exists.\n");
         }
     }
 
     /**
      * Reset repository to commit ID.
      * @param id commit id
-     * @throws GitletException
+     * @throws GittaException
      */
     public static void reset(String id) throws GittaException {
         Commit commit = Commit.getCommit(id);
         if (commit == null) {
-            throw new GittaException("No commit with that id exists");
+            throw new GittaException("No commit with that id exists\n");
         }
         if (!isValidCommitCheckout(id)) {
             throw new GittaException("There is an untracked file in the way;"
-                                  + " delete it, or add and commit it first.");
+                                  + " delete it, or add and commit it first.\n");
         }
         checkoutCommit(id);
         _reference.branchUpdate(_head, id);
@@ -444,11 +443,11 @@ public class Repository {
     /**
      * Merge BRANCH into current _HEAD.
      * @param branch branch name
-     * @throws GitletException
+     * @throws GittaException
      */
     public static void merge(String branch) throws GittaException {
         if (!_stage.isEmpty()) {
-            throw new GittaException("You have uncommitted changes.");
+            throw new GittaException("You have uncommitted changes.\n");
         }
         checkBranchExist(branch);
         validateNotHeadBranch(branch);
@@ -457,10 +456,10 @@ public class Repository {
         String branchId = _reference.getBranch(branch);
         if (splitId.equals(branchId)) {
             throw new GittaException("Given branch is an ancestor"
-                                       + "of the current branch.");
+                                       + "of the current branch.\n");
         } else if (splitId.equals(curId)) {
             checkoutCommit(branchId);
-            throw new GittaException("Current branch fast-forwarded.");
+            throw new GittaException("Current branch fast-forwarded.\n");
         } else {
             handleMerge(curId, branchId, splitId, branch);
         }
@@ -481,7 +480,7 @@ public class Repository {
         for (String file : getUntrackedFileNames()) {
             if (given.containsFile(file)) {
                 throw new GittaException("There is an untracked file"
-                + "in the way; delete it, or add and commit it first.");
+                + "in the way; delete it, or add and commit it first.\n");
             }
         }
         Set<String> files = new HashSet<>(_lastCommit.getObjects().keySet());
@@ -518,7 +517,7 @@ public class Repository {
         _stage.save();
         commit("Merged " + branch + " into " + _head + ".", branchId);
         if (conflict) {
-            System.out.print("Encountered a merge conflict.");
+            System.out.print("Encountered a merge conflict.\n");
         }
     }
 
@@ -529,7 +528,7 @@ public class Repository {
      */
     private static void validateNotHeadBranch(String branch) {
         if (branch.equals(_head)) {
-            throw new GittaException("Cannot merge a branch with itself.");
+            throw new GittaException("Cannot merge a branch with itself.\n");
         }
     }
 

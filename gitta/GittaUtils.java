@@ -12,10 +12,10 @@ public class GittaUtils {
     /** Deletes FILE if it exists and is not a directory.  Returns true
      *  if FILE was deleted, and false otherwise.  Refuses to delete FILE
      *  and throws IllegalArgumentException unless the directory designated by
-     *  FILE also contains a directory named .gitlet. */
+     *  FILE also contains a directory named .gitta. */
     static boolean restrictedDelete(File file) {
         if (!(new File(file.getParentFile(), ".gitta")).isDirectory()) {
-            throw new IllegalArgumentException("not .gitta working directory");
+            throw new IllegalArgumentException("not .gitta working directory\n");
         }
         if (!file.isDirectory()) {
             return file.delete();
@@ -27,7 +27,7 @@ public class GittaUtils {
     /** Deletes the file named FILE if it exists and is not a directory.
      *  Returns true if FILE was deleted, and false otherwise.  Refuses
      *  to delete FILE and throws IllegalArgumentException unless the
-     *  directory designated by FILE also contains a directory named .gitlet. */
+     *  directory designated by FILE also contains a directory named .gitta. */
     static boolean restrictedDelete(String file) {
         return restrictedDelete(new File(file));
     }
