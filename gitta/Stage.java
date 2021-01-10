@@ -183,7 +183,7 @@ public class Stage implements GittaIO {
 	            }
 	            String oldsha1 = _stagedFiles.put(filename, sha1);
 	            if (!_stagedFiles.containsValue(oldsha1)) {
-	                deleteBlob(oldsha1);
+	                deleteObject(oldsha1);
 	            }
 	        } else {
 	            _stagedFiles.put(file.getName(), sha1);
@@ -199,7 +199,7 @@ public class Stage implements GittaIO {
 	            }
 	            String oldsha1 = _stagedFiles.put(filename, sha1);
 	            if (!_stagedFiles.containsValue(oldsha1)) {
-	                deleteBlob(oldsha1);
+	                deleteObject(oldsha1);
 	            }
 	        } else {
 	            _stagedFiles.put(file.getName(), sha1);
@@ -234,7 +234,7 @@ public class Stage implements GittaIO {
     public void clear() {
         for (String sha1 : _stagedFiles.values()) {
             if (GittaUtils.join(STAGE_FOLDER, sha1).exists()) {
-                deleteBlob(sha1);
+                deleteObject(sha1);
             }
         }
         _stagedFiles.clear();
@@ -264,7 +264,7 @@ public class Stage implements GittaIO {
      * Delete a blob from staging area.
      * @param sha1 id of blob file
      */
-    private void deleteBlob(String sha1) {
+    private void deleteObject(String sha1) {
         assert GittaUtils.join(STAGE_FOLDER, sha1).delete();
     }
 

@@ -13,7 +13,7 @@ public class Main {
      *  <COMMAND> <OPERAND> .... */
     public static void main(String... args) {
         if (args.length == 0) {
-            System.out.print("Please enter a command.");
+            System.out.print("Please enter a command.\n");
             System.exit(0);
         }
 
@@ -59,7 +59,7 @@ public class Main {
                 merge(args);
                 break;
             default:
-                System.out.print("No command with that name exists.");
+                System.out.print("No command with that name exists.\n");
             }
         } catch (GittaException e) {
             System.out.print(e.getMsg());
@@ -217,7 +217,7 @@ public class Main {
         if ((type > 0 && args.length <= expected)
             || (type == 0 && args.length != expected)
             || (type < 0 && args.length >= expected)) {
-            System.out.println("Incorrect operands.");
+            System.out.println("Incorrect operands.\n");
             System.exit(0);
         }
     }
@@ -229,11 +229,11 @@ public class Main {
     private static void validateRepoExist(boolean expected) {
         if (Repository.isExisted() != expected) {
             if (expected) {
-                System.out.println("Not in an initialized Gitlet directory");
+                System.out.println("Not in an initialized Gitta directory\n");
                 System.exit(0);
             } else {
-                System.out.println("A Gitlet version-control system"
-                    + "already exists in the current directory.");
+                System.out.println("A Gitta version-control system"
+                    + "already exists in the current directory.\n");
                 System.exit(0);
             }
         }
@@ -242,7 +242,7 @@ public class Main {
     /** Validate staging area is empty. */
     private static void validateStageEmpty() {
         if (Stage.getStage().isEmpty()) {
-            System.out.println("No changes added to the commit.");
+            System.out.println("No changes added to the commit.\n");
             System.exit(0);
         }
     }
@@ -254,7 +254,7 @@ public class Main {
     private static void validateMSG(String msg) {
         assert msg != null;
         if (msg.trim().equals("")) {
-            System.out.println("Please enter a commit message");
+            System.out.println("Please enter a commit message\n");
             System.exit(0);
         }
     }
@@ -270,7 +270,7 @@ public class Main {
         for (int i = offset; i < args.length; i += 1) {
             File f = GittaUtils.join(PWD, args[i]);
             if (!f.exists()) {
-                System.out.println("File does not exist.");
+                System.out.println("File does not exist.\n");
                 System.exit(0);
             }
             files.add(f);
