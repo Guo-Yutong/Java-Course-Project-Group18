@@ -14,7 +14,11 @@ public class Blob extends GittaObjects implements GittaIO {
         }
     }
     
-    public String SHA1() {
+    /**
+     * Calculate SHA1 value of a blob.
+     * @return SHA1 value as a string
+     */
+    public String getSHA1() {
         return super.getSHA1(GittaIO.serialize(this));
     }
     

@@ -174,21 +174,38 @@ public class Stage implements GittaIO {
         assert file.exists();
 
         String filename = file.getName();
-        Blob blob = new Blob(file);
-        String sha1 = blob.SHA1();
-        if (_stagedFiles.containsKey(filename)) {
-            if (_stagedFiles.get(filename).equals(sha1)) {
-                return;
-            }
-            String oldsha1 = _stagedFiles.put(filename, sha1);
-            if (!_stagedFiles.containsValue(oldsha1)) {
-                deleteBlob(oldsha1);
-            }
-        } else {
-            _stagedFiles.put(file.getName(), sha1);
-            saveBlob(sha1, blob);
+        if(file.isFile()) {
+        	Blob blob = new Blob(file);
+	        String sha1 = blob.getSHA1();
+	        if (_stagedFiles.containsKey(filename)) {
+	            if (_stagedFiles.get(filename).equals(sha1)) {
+	                return;
+	            }
+	            String oldsha1 = _stagedFiles.put(filename, sha1);
+	            if (!_stagedFiles.containsValue(oldsha1)) {
+	                deleteBlob(oldsha1);
+	            }
+	        } else {
+	            _stagedFiles.put(file.getName(), sha1);
+	            saveBlob(sha1, blob);
+	        }
+	        save();
+        }else if(file.isDirectory()) {
+        	Tree tree = new Tree(file);
+        	String sha1 = tree.getSHA1();
+        	if (_stagedFiles.containsKey(filename)) {
+	            if (_stagedFiles.get(filename).equals(sha1)) {
+	                return;
+	            }
+	            String oldsha1 = _stagedFiles.put(filename, sha1);
+	            if (!_stagedFiles.containsValue(oldsha1)) {
+	                deleteBlob(oldsha1);
+	            }
+	        } else {
+	            _stagedFiles.put(file.getName(), sha1);
+	            saveTree(sha1, tree);
+	        }
         }
-        save();
     }
 
     /**
@@ -232,6 +249,15 @@ public class Stage implements GittaIO {
      */
     private void saveBlob(String sha1, Blob blob) {
         GittaIO.writeObject(GittaUtils.join(STAGE_FOLDER, sha1), blob);
+    }
+    
+    /**
+     * Save a tree to staging area.
+     * @param sha1 id of tree file
+     * @param tree tree object
+     */
+    private void saveTree(String sha1, Tree tree) {
+        GittaIO.writeObject(GittaUtils.join(STAGE_FOLDER, sha1), tree);
     }
 
     /**

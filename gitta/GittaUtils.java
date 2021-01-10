@@ -14,8 +14,8 @@ public class GittaUtils {
      *  and throws IllegalArgumentException unless the directory designated by
      *  FILE also contains a directory named .gitlet. */
     static boolean restrictedDelete(File file) {
-        if (!(new File(file.getParentFile(), ".gitlet")).isDirectory()) {
-            throw new IllegalArgumentException("not .gitlet working directory");
+        if (!(new File(file.getParentFile(), ".gitta")).isDirectory()) {
+            throw new IllegalArgumentException("not .gitta working directory");
         }
         if (!file.isDirectory()) {
             return file.delete();
@@ -47,7 +47,7 @@ public class GittaUtils {
      *  lexicographic order as Java Strings.  Returns null if DIR does
      *  not denote a directory. */
     static List<String> plainFilenamesIn(File dir) {
-        String[] files = dir.list(PLAIN_FILES);
+        String[] files = dir.list();
         if (files == null) {
             return null;
         } else {
@@ -61,6 +61,26 @@ public class GittaUtils {
      *  not denote a directory. */
     static List<String> plainFilenamesIn(String dir) {
         return plainFilenamesIn(new File(dir));
+    }
+    
+    /** Returns a list of all plain files in the directory DIR, in
+     *  lexicographic order as Java Strings.  Returns null if DIR does
+     *  not denote a directory. */
+    static List<File> plainFilesIn(File dir) {
+        File[] files = dir.listFiles();
+        if (files == null) {
+            return null;
+        } else {
+            Arrays.sort(files);
+            return Arrays.asList(files);
+        }
+    }
+    
+    /** Returns a list of all plain files in the directory DIR, in
+     *  lexicographic order as Java Strings.  Returns null if DIR does
+     *  not denote a directory. */
+    static List<File> plainFilesIn(String dir) {
+        return plainFilesIn(new File(dir));
     }
 
     /* OTHER FILE UTILITIES */
@@ -77,6 +97,14 @@ public class GittaUtils {
      *  method. */
     static File join(File first, String... others) {
         return Paths.get(first.getPath(), others).toFile();
+    }
+    
+    public static void main(String[] args) {
+    	GittaUtils utl = new GittaUtils();
+    	System.out.println(utl.plainFilenamesIn("/home/yutong_guo/Java/gitta/bin/newfolder/newfolder2"));
+    	for(String str : utl.plainFilenamesIn("/home/yutong_guo/Java/gitta/bin/newfolder/newfolder2")) {
+    		System.out.println(join("/home/yutong_guo/Java/gitta/bin/newfolder/newfolder2",str).getAbsolutePath());
+    	}
     }
 
 }

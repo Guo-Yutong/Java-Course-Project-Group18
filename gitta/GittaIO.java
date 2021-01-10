@@ -75,6 +75,28 @@ public interface GittaIO extends Serializable{
             throw new IllegalArgumentException(excp.getMessage());
         }
     }
+ 
+    /** Return an object of type T read from FILE, without appoint an expected type.
+     *  Throws IllegalArgumentException in case of problems. */
+    static <T extends Serializable> T readObject(File file) {
+        try {
+            ObjectInputStream in =
+                new ObjectInputStream(new FileInputStream(file));
+            T result = (T) in.readObject();
+            in.close();
+            return result;
+        } catch (IOException | ClassCastException
+                 | ClassNotFoundException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
+        }
+    }
+    
+    
+    static <T extends Serializable> T readObject(String filename) {
+        File file = new File(filename);
+        return readObject(file);
+    }
+    
 
     /** Write OBJ to FILE. */
     static void writeObject(File file, Serializable obj) {

@@ -60,9 +60,9 @@ public class Repository {
     public static void add(List<File> files) {
         for (File file : files) {
         	if (file.isFile()) {
-	            String sha1 = new Blob(file).SHA1();
+	            String sha1 = new Blob(file).getSHA1();
 	            if (_lastCommit.containsFile(file)
-	                && _lastCommit.getBlobId(file).equals(sha1)) {
+	                && _lastCommit.getObjectId(file).equals(sha1)) {
 	                if (_stage.isFileStaged(file)) {
 	                    _stage.unstagedFile(file);
 	                }
@@ -74,9 +74,9 @@ public class Repository {
 	                _stage.save();
 	            }
         	}else if (file.isDirectory()) {
-        		String sha1 = new Tree(file).SHA1();
+        		String sha1 = new Tree(file).getSHA1();
 	            if (_lastCommit.containsFile(file)
-	                && _lastCommit.getBlobId(file).equals(sha1)) {
+	                && _lastCommit.getObjectId(file).equals(sha1)) {
 	                if (_stage.isFileStaged(file)) {
 	                    _stage.unstagedFile(file);
 	                }
@@ -87,6 +87,9 @@ public class Repository {
 	                _stage.addFile(file);
 	                _stage.save();
 	            }
+	            
+	            List<File> subsFile = GittaUtils.plainFilesIn(file);
+	            add(subsFile);
         	}
         }
     }
@@ -251,22 +254,35 @@ public class Repository {
     private static List<String> getModifiedFileNames() {
         List<String> modifiedFiles = new ArrayList<>();
         for (String name : GittaUtils.plainFilenamesIn(PWD)) {
-            String sha1 = new Blob(GittaUtils.join(PWD, name)).SHA1();
-            if (_lastCommit.containsFile(name)
-                    && !_lastCommit.containsBlob(sha1)
-                    && !_stage.isFileStaged(name)) {
-                modifiedFiles.add(name + " (modified)");
-            } else if (_stage.isFileStaged(name)
-                    && !_stage.isBlobStaged(name, sha1)) {
-                modifiedFiles.add(name + " (modified");
-            }
+        	GittaObjects obj = GittaIO.readObject(GittaUtils.join(PWD, name));
+        	if(obj instanceof Blob) {
+	            String sha1 = ((Blob)(obj)).getSHA1();
+	            if (_lastCommit.containsFile(name)
+	                    && !_lastCommit.containsObject(sha1)
+	                    && !_stage.isFileStaged(name)) {
+	                modifiedFiles.add(name + " (modified)");
+	            } else if (_stage.isFileStaged(name)
+	                    && !_stage.isBlobStaged(name, sha1)) {
+	                modifiedFiles.add(name + " (modified");
+	            }
+	        } else if (obj instanceof Tree) {
+	        	String sha1 = ((Tree)(obj)).getSHA1();
+	            if (_lastCommit.containsFile(name)
+	                    && !_lastCommit.containsObject(sha1)
+	                    && !_stage.isFileStaged(name)) {
+	                modifiedFiles.add(name + " (modified)");
+	            } else if (_stage.isFileStaged(name)
+	                    && !_stage.isBlobStaged(name, sha1)) {
+	                modifiedFiles.add(name + " (modified");
+	            }
+	        }
         }
         for (String name : _stage.getStagedFileNames()) {
             if (!GittaUtils.join(PWD, name).exists()) {
                 modifiedFiles.add(name + " (deleted)");
             }
         }
-        for (String name : _lastCommit.getBlobNames()) {
+        for (String name : _lastCommit.getObjectNames()) {
             if (!GittaUtils.join(PWD, name).exists()
                 && !_stage.getRemovedFiles().contains(name)) {
                 modifiedFiles.add(name + " (deleted)");
@@ -354,8 +370,8 @@ public class Repository {
      */
     private static void checkoutCommit(String id) {
         Commit commit = Commit.getCommit(id);
-        HashSet<String> filenames = new HashSet<>(commit.getBlobNames());
-        for (String name : _lastCommit.getBlobNames()) {
+        HashSet<String> filenames = new HashSet<>(commit.getObjectNames());
+        for (String name : _lastCommit.getObjectNames()) {
             if (!filenames.contains(name)) {
                 GittaUtils.join(PWD, name).delete();
             }
@@ -470,9 +486,9 @@ public class Repository {
                 + "in the way; delete it, or add and commit it first.");
             }
         }
-        Set<String> files = new HashSet<>(_lastCommit.getBlobs().keySet());
-        files.addAll(lca.getBlobs().keySet());
-        files.addAll(given.getBlobs().keySet());
+        Set<String> files = new HashSet<>(_lastCommit.getObjects().keySet());
+        files.addAll(lca.getObjects().keySet());
+        files.addAll(given.getObjects().keySet());
         for (String filename : files) {
             boolean givenModified = isModifiedSince(filename, given, lca);
             boolean curModified = isModifiedSince(filename,
@@ -529,7 +545,7 @@ public class Repository {
     private static boolean isModifiedSince(String file,
                                 Commit commit, Commit lca) {
         return lca.containsFile(file) && commit.containsFile(file)
-                && !lca.getBlobId(file).equals(commit.getBlobId(file));
+                && !lca.getObjectId(file).equals(commit.getObjectId(file));
     }
 
     /**
@@ -566,7 +582,7 @@ public class Repository {
      */
     private static boolean isSameSince(String file, Commit commit, Commit lca) {
         return lca.containsFile(file) && commit.containsFile(file)
-                && lca.getBlobId(file).equals(commit.getBlobId(file));
+                && lca.getObjectId(file).equals(commit.getObjectId(file));
     }
 
     /**
@@ -585,8 +601,8 @@ public class Repository {
      * @param commit commit object
      */
     private static void modifyConflictFile(String filename, Commit commit) {
-        Blob curBlob = _lastCommit.getBlob(filename);
-        Blob otherBlob = commit.getBlob(filename);
+        GittaObjects curBlob = _lastCommit.getObject(filename);
+        GittaObjects otherBlob = commit.getObject(filename);
 
         String newContent = "<<<<<<< HEAD"
                             + System.getProperty("line.separator", "\n");

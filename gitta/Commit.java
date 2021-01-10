@@ -23,8 +23,8 @@ public class Commit extends GittaObjects implements GittaIO{
     private String _secondParentId;
     /** commit message. */
     private String _msg;
-    /** Mapping from blob filename to its Id. */
-    private HashMap<String, String> _blobs;
+    /** Mapping from blob or tree filename to its Id. */
+    private HashMap<String, String> _objects;
     /** Commit timestamp. */
     private String _timestamp;
     /** Id shorthand len. */
@@ -39,13 +39,13 @@ public class Commit extends GittaObjects implements GittaIO{
      * @param blobs commit blobs
      */
     Commit(String msg, boolean timestamp, String parentId,
-           String secondParentId, HashMap<String, String> blobs) {
+           String secondParentId, HashMap<String, String> objects) {
         _msg = msg;
         _timestamp = createTimestamp(timestamp);
         _parentId = parentId;
         _secondParentId = secondParentId;
-        if (blobs == null) {
-            _blobs = new HashMap<>();
+        if (objects == null) {
+            _objects = new HashMap<>();
         }
     }
 
@@ -60,7 +60,7 @@ public class Commit extends GittaObjects implements GittaIO{
         _timestamp = createTimestamp(true);
         _parentId = parentId;
         _secondParentId = null;
-        _blobs = other._blobs;
+        _objects = other._objects;
     }
 
     /**
@@ -75,7 +75,7 @@ public class Commit extends GittaObjects implements GittaIO{
         _timestamp = createTimestamp(true);
         _parentId = parentId;
         _secondParentId = secondParentId;
-        _blobs = other._blobs;
+        _objects = other._objects;
     }
 
     /**
@@ -97,8 +97,8 @@ public class Commit extends GittaObjects implements GittaIO{
      * @param sha1 id of blob
      * @return true if current commit contains blob
      */
-    public boolean containsBlob(String sha1) {
-        return _blobs.containsValue(sha1);
+    public boolean containsObject(String sha1) {
+        return _objects.containsValue(sha1);
     }
 
     /**
@@ -116,7 +116,7 @@ public class Commit extends GittaObjects implements GittaIO{
      * @return true if current commit contains NAME
      */
     public boolean containsFile(String name) {
-        return _blobs.containsKey(name);
+        return _objects.containsKey(name);
     }
 
     /**
@@ -125,7 +125,7 @@ public class Commit extends GittaObjects implements GittaIO{
      * @return blob file id
      */
     public String getFileId(File file) {
-        return _blobs.get(file.getName());
+        return _objects.get(file.getName());
     }
 
     /**
@@ -149,16 +149,22 @@ public class Commit extends GittaObjects implements GittaIO{
      * @param filename commited file name
      * @param blob commit file's blob
      */
-    public void commitFile(String filename, File blob) {
-        _blobs.put(filename, blob.getName());
-        Blob.saveBlob(blob);
+    public void commitFile(String filename, File object) {
+    	GittaObjects obj = GittaIO.readObject(object);
+    	if (obj instanceof Blob) {
+	        _objects.put(filename, object.getName());
+	        Blob.saveBlob(object);
+    	}else if(obj instanceof Tree) {
+    		_objects.put(filename, object.getName());
+    		Tree.saveTree(object);
+    	}
     }
 
     /** Remove blob filename from mapping.
      * @param filename remove file name
      */
     public void removeFile(String filename) {
-        _blobs.remove(filename);
+        _objects.remove(filename);
     }
 
     /**
@@ -205,41 +211,47 @@ public class Commit extends GittaObjects implements GittaIO{
     }
 
     /**
-     * Return blob id according to blob file name.
+     * Return Object id according to blob file name.
      * @param filename filename in current commit
-     * @return blob id
+     * @return object id
      */
-    public String getBlobId(String filename) {
-        if (!_blobs.containsKey(filename)) {
+    public String getObjectId(String filename) {
+        if (!_objects.containsKey(filename)) {
             return null;
         }
-        return _blobs.get(filename);
+        return _objects.get(filename);
     }
 
     /**
-     * Return blob id according to file.
+     * Return object id according to file.
      * @param file file
-     * @return corresponding blobId of FILE
+     * @return corresponding objectId of FILE
      */
-    public String getBlobId(File file) {
-        return getBlobId(file.getName());
+    public String getObjectId(File file) {
+        return getObjectId(file.getName());
     }
 
     /**
-     * Return blob according to filename.
+     * Return object according to filename.
      * @param filename
-     * @return corresponding blob of FILENAME
+     * @return corresponding object of FILENAME
      */
-    public Blob getBlob(String filename) {
-        if (!_blobs.containsKey(filename)) {
+    public GittaObjects getObject(String filename) {
+        if (!_objects.containsKey(filename)) {
             return null;
         }
-        return Blob.getBlob(_blobs.get(filename));
+        GittaObjects obj = GittaIO.readObject(filename);
+        if (obj instanceof Blob) {
+        	return Blob.getBlob(_objects.get(filename));
+        }else if (obj instanceof Tree) {
+        	return Tree.getTree(_objects.get(filename));
+        }
+		return null;
     }
 
-    /** Return current commit's blobs set. */
-    public Map<String, String> getBlobs() {
-        return _blobs;
+    /** Return current commit's objects set. */
+    public Map<String, String> getObjects() {
+        return _objects;
     }
 
     /** Return commit's msg. */
@@ -319,7 +331,7 @@ public class Commit extends GittaObjects implements GittaIO{
         if (!containsFile(file)) {
             return;
         }
-        Blob blob = Blob.getBlob(_blobs.get(file.getName()));
+        Blob blob = Blob.getBlob(_objects.get(file.getName()));
         GittaIO.writeContents(file, blob.getContent());
     }
 
@@ -328,16 +340,16 @@ public class Commit extends GittaObjects implements GittaIO{
      * @param dir WD
      */
     public void restoreCommit(File dir) {
-        for (String filename : _blobs.keySet()) {
-            Blob blob = Blob.getBlob(_blobs.get(filename));
+        for (String filename : _objects.keySet()) {
+            Blob blob = Blob.getBlob(_objects.get(filename));
             GittaIO.writeContents(GittaUtils.join(dir, filename),
                                 blob.getContent());
         }
     }
 
     /** Return Blob Names list. */
-    public List<String> getBlobNames() {
-        return new ArrayList<>(_blobs.keySet());
+    public List<String> getObjectNames() {
+        return new ArrayList<>(_objects.keySet());
     }
 
 }
