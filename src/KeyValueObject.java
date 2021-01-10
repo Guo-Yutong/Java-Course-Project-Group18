@@ -1,31 +1,27 @@
 package src;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
 
 public abstract class KeyValueObject {
-    protected String type;//类型
-    protected String key; //key
+    protected String type;
+    protected String key; 
+    protected String value;
     protected File file; 
 
-    protected KeyValueObject() {
+    KeyValueObject() {
     }
 
     //生成key的函数，参数为文件
     protected void generateKey(File file) throws IOException, NoSuchAlgorithmException {
-        Hash s = new Hash(file); //创建hash类
+        HashUtils s = new HashUtils(file); 
         this.key = s.getSHA1(); //使用hash类方法，可以得到16进制字符串key值
         this.file = file; 
     }
 
-    //生成key的函数，参数为hash值字符串（tree的value）
+    //生成key的函数，参数为字符串
     protected void generateKey(String value) throws IOException, NoSuchAlgorithmException {
-        Hash s = new Hash(value);
+        HashUtils s = new HashUtils(value);
         this.key = s.getSHA1();
     }
 
@@ -38,8 +34,12 @@ public abstract class KeyValueObject {
         return this.type;
     }
 
-    //拷贝一份文件，内容相同，名字为其key值
-    protected void copyFile() throws IOException{
+    protected String getValue(){
+        return this.value;
+    }
+
+    //复制一份文件，内容相同，名字为其key值
+    protected void writeFile() throws IOException{
         try(
             FileInputStream filein = new FileInputStream("this.file");
             BufferedInputStream input = new BufferedInputStream(filein);
@@ -49,7 +49,7 @@ public abstract class KeyValueObject {
             int r = 0;
             while((r = input.read())!= -1){
                 output.write((byte)r);
-            }//为了写文件安全，写时未设置buffer
+            }
         }
     }
 }

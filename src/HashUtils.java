@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * Hash
- */
 
  public class HashUtils{
     private String ans; //hash值16进制字符串表示

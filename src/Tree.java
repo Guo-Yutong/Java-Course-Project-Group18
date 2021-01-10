@@ -34,7 +34,7 @@ public class Tree extends KeyValueObject {
 
     //重写父类的复制文件方法，文件名字为key值，文件内容为value值
     @Override
-    public void copyFile() throws IOException{
+    public void writeFile() throws IOException{
         PrintWriter cp = new PrintWriter(this.key);//PrintWriter向文本输出
         cp.print(value);
         cp.close();//

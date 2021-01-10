@@ -1,0 +1,15 @@
+> init
+<<<
++ wug.txt wug.txt
+> add wug.txt
+<<<
++ wug.txt notwug.txt
+> commit "added wug"
+<<<
+#> status
+#<<<
+#log
+#<<<
+> checkout -- wug.txt
+<<<
+= wug.txt wug.txt
